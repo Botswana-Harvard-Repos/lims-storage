@@ -32,6 +32,7 @@
                     <a href="{% url 'facility_detail' facility.id %}"
                        class="breadcrumb-item">
                         <i class="fas fa-building"></i> {{ facility.facility_name }}
+                    (Facility)
                     </a>
                 {% endif %}
 
@@ -39,6 +40,7 @@
                     <a href="{% url 'freezer_detail' obj.freezer_id %}"
                        class="breadcrumb-item">
                         <i class="fas fa-snowflake"></i> {{ obj.freezer.freezer_name }}
+                    (Freezer)
                     </a>
                 {% endif %}
 
@@ -46,16 +48,18 @@
                     <a href="{% url 'shelf_detail' obj.shelf.id %}"
                        class="breadcrumb-item">
                         <i class="fas fa-border-all"></i> {{ obj.shelf.shelf_name }}
+                    (Shelf)
                     </a>
                 {% endif %}
 
                 {% if obj.rack %}
                     <a href="{% url 'rack_detail' obj.rack.id %}" class="breadcrumb-item">
                         <i class='fas fa-box-open'></i> {{ obj.rack.rack_name }}
+                    (Rack)
                     </a>
                 {% endif %}
                 <span class="breadcrumb-item active">
-                <i class="{{ icon }}"></i> {{ name }}
+                <i class="{{ icon }}"></i> {{ name }} ({{ type }})
             </span>
             {% endblock %}
         </div>
@@ -65,7 +69,7 @@
                    style="font-size: 5rem;"></i>
                 <div class="d-flex flex-column">
                     <span style="font-size: 1.5rem;">{{ name }}</span>
-                    <span style="font-size: 1rem;">Storage View</span>
+                    <span style="font-size: 1rem;">Storage View ({{ type }})</span>
                 </div>
             </div>
         {% endblock %}

@@ -1,0 +1,56 @@
+{% load storage_module_extras %}
+
+<div class="d-flex flex-column mt-4 col-lg-9">
+    <div class="row">
+        <div class="card d-flex align-items-center justify-content-center"
+             style="margin: 3px; height: 4rem; width: 4rem;">
+            <input type="checkbox" id="select-all">
+        </div>
+        {% for x in x_labels %}
+            <div class="card"
+                 style="margin: 3px; height: 4rem; width: 4rem;">
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    {{ x }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% for y in y_labels %}
+        <div class="row">
+            <div class="card"
+                 style="margin: 3px; height: 4rem; width: 4rem;">
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    {{ y }}
+                </div>
+            </div>
+            {% for x in x_labels %}
+                <div class="card bg-light" data-x="{{ x }}"
+                     data-y="{{ y }}"
+                     style="margin: 3px; height: 4rem; width: 4rem;">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center"
+                         style="padding: 0">
+                        {% with x_dict=positions_dict|get_item:x %}
+                            {% with y_dict=x_dict|get_item:y %}
+                                {% if y_dict %}
+                                    <input type="checkbox"
+                                           name="sample_ids"
+                                           value="{{ y_dict.sample_id }}">
+                                    <a class="text-center "
+                                       style="font-size: 9px" href="#"
+                                       data-bs-toggle="offcanvas"
+                                       data-bs-target="#sampleDetailsDrawer">
+                                        <i class="fas fa-vial"></i>
+                                        {{ y_dict.sample_id }}
+                                    </a>
+                                {% else %}
+                                    <i id="scanIcon"
+                                       class="fas fa-plus"></i>
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

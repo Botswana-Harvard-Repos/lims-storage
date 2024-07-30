@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import JsonResponse
@@ -5,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import TemplateView
 
-from storage_module.models import (BoxPosition, DimFacility, DimFreezer, DimRack,
+from storage_module.models import (BoxPosition, DimBox, DimFacility, DimFreezer, DimRack,
                                    DimSample, DimSampleType, DimShelf)
 from storage_module.util import append_entity_info, append_if_samples
 from storage_module.views import SampleMoveWizard
@@ -127,3 +129,38 @@ def ajax_validate_position(request):
         }
         return JsonResponse(error)
     return JsonResponse({"error": None})
+
+
+def check_barcode(request):
+    data = json.loads(request.body)
+    sample_id = data.get('barcode')
+    exists = DimSample.objects.filter(sample_id=sample_id).exists()
+    return JsonResponse({'valid': exists})
+
+
+def add_samples(request):
+    data = json.loads(request.body)
+    barcode = data.get('scannedBarcode')
+    box_id = data.get('box_id')
+    x = data.get('x')
+    y = data.get('y')
+
+    if not all([barcode, box_id, x, y]):
+        return JsonResponse({'success': False, 'error': 'Missing data in request.'})
+
+    try:
+        position = BoxPosition.objects.get(sample__sample_id=barcode)
+    except BoxPosition.DoesNotExist:
+        return JsonResponse(
+            {'success': False, 'error': 'No position found for this barcode.'})
+
+    try:
+        box = DimBox.objects.get(box_name=box_id)
+    except DimBox.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Failed to retrieve box.'})
+
+    position.box = box
+    position.x_position = x
+    position.y_position = y
+    position.save()
+    return JsonResponse({'success': True})

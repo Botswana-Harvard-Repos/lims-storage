@@ -53,6 +53,25 @@
                     $('form').submit();
                 }
             });
+            $(".btn-outline-secondary").click(function (event) {
+                event.preventDefault();
+                var prevStep = "{{ wizard.steps.prev }}";
+                var form = document.createElement("form");
+                form.method = "POST";
+                var csrfInput = document.createElement("input");
+                csrfInput.type = "hidden";
+                csrfInput.name = "csrfmiddlewaretoken";
+                csrfInput.value = "{{ csrf_token }}";
+                form.appendChild(csrfInput);
+                var hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = "wizard_goto_step";
+                hiddenInput.value = prevStep;
+                form.appendChild(hiddenInput);
+                document.body.appendChild(form);
+                form.submit();
+            });
+
         });
     </script>
 
@@ -88,7 +107,8 @@
                     {{ wizard.form.management_form }}
                     {% for form in wizard.form %}
                         <div class="form-group mb-3">
-                            <div><strong>Sample {{ forloop.counter }}</strong></div>
+                            <div><strong>Sample ID: {{ form.initial.sample_id }}</strong>
+                            </div>
                             {% if form is not None and form.fields %}
                                 {{ form }}
                             {% endif %}

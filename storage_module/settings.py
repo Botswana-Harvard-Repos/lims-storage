@@ -179,3 +179,20 @@ DEFAULT_FROM_EMAIL = config_file['email']['email_from']
 
 PRINTER_IP_ADDRESS = config_file['printing']['ip_address']
 PRINTER_PORT = config_file['printing']['port']
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'DEBUG',
+    },
+}

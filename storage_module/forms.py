@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import Q
 
 from storage_module.models import DimBox, DimFacility, DimFreezer, DimRack, \
-    DimShelf
+    DimSample, DimShelf
 
 
 class MoveSampleForm(forms.Form):
@@ -104,3 +104,7 @@ class SampleMoveForm(forms.Form):
         self.box = kwargs.pop('box', None)
         self.sample_ids = kwargs.pop('sample_ids', None)
         super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = DimSample
+        fields = ('sample_id',)

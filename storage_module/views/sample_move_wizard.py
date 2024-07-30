@@ -54,14 +54,14 @@ class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
             sample_ids = form_kwargs.get('sample_ids', [])
             selected_box = self.get_cleaned_data_for_step('2')['box']
             self.request.session['selected_box'] = selected_box.id
-            SampleMoveFormSet = forms.formset_factory(SampleMoveForm, extra=0,
-                                                      can_delete=False)
+            sample_move_form_set = forms.formset_factory(SampleMoveForm, extra=0,
+                                                         can_delete=False)
             if data is not None:
-                form = SampleMoveFormSet(data=data, initial=[
+                form = sample_move_form_set(data=data, initial=[
                     {'sample_id': sample_id, 'box': selected_box} for sample_id in
                     sample_ids])
             else:
-                form = SampleMoveFormSet(
+                form = sample_move_form_set(
                     initial=[{'sample_id': sample_id, 'box': selected_box} for sample_id
                              in sample_ids])
 
@@ -69,6 +69,9 @@ class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
+        sample_id = self.request.GET.get('sample_ids', '')
+        sample = DimSample.objects.get(sample_id=sample_id)
+        context['sample'] = sample
 
         selected_box = self.storage.extra_data.get('selected_box')
         context['selected_box'] = selected_box

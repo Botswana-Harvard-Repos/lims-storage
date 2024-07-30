@@ -39,34 +39,38 @@
                     $('#sampleDetailsBody').empty();
 
                     var newDetailsContent = `
-                        <aside >
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h2 class="card-title">${data.sample_id}'s Information</h2>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><strong>Type:</strong> ${data.sample_type}</li>
-                                        <li class="list-group-item"><strong>Source File:</strong> ${data.source_file}</li>
-                                        <li class="list-group-item"><strong>Time Sampled:</strong> ${data.time_sampled}</li>
-                                        <li class="list-group-item"><strong>Condition:</strong> ${data.sample_condition}</li>
-                                        <li class="list-group-item"><strong>Created By:</strong> ${data.user_created}</li>
-                                        <li class="list-group-item"><strong>Participant ID:</strong> ${data.participant_id}</li>
-                                        <li class="list-group-item"><strong>Gender:</strong> ${data.gender}</li>
-                                        <li class="list-group-item"><strong>Date of Birth:</strong> ${data.date_of_birth}</li>
-                                        <li class="list-group-item"><strong>Date Sampled:</strong> ${data.date_sampled}</li>
-                                        <li class="list-group-item"><strong>Requisition ID:</strong> ${data.requisition_id}</li>
-                                        <li class="list-group-item"><strong>Protocol Number:</strong> ${data.protocol_number}</li>
-                                        <li class="list-group-item"><strong>Status:</strong> <span class="badge badge-pill badge-warning bg-warning">${data.sample_status}</span></li>
-                                    </ul>
+                        <aside class="col-lg-3">
+                            <div class="sidebar">
+                                <div class="card mb-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h2 class="card-title">${data.sample_id}'s Information</h2>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item"><strong>Type:</strong> ${data.sample_type}</li>
+                                                <li class="list-group-item"><strong>Source File:</strong> ${data.source_file}</li>
+                                                <li class="list-group-item"><strong>Time Sampled:</strong> ${data.time_sampled}</li>
+                                                <li class="list-group-item"><strong>Condition:</strong> ${data.sample_condition}</li>
+                                                <li class="list-group-item"><strong>Created By:</strong> ${data.user_created}</li>
+                                                <li class="list-group-item"><strong>Participant ID:</strong> ${data.participant_id}</li>
+                                                <li class="list-group-item"><strong>Gender:</strong> ${data.gender}</li>
+                                                <li class="list-group-item"><strong>Date of Birth:</strong> ${data.date_of_birth}</li>
+                                                <li class="list-group-item"><strong>Date Sampled:</strong> ${data.date_sampled}</li>
+                                                <li class="list-group-item"><strong>Requisition ID:</strong> ${data.requisition_id}</li>
+                                                <li class="list-group-item"><strong>Protocol Number:</strong> ${data.protocol_number}</li>
+                                                <li class="list-group-item"><strong>Status:</strong> <span class="badge badge-pill badge-warning bg-warning">${data.sample_status}</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <!-- Add More Divs as needed -->
-                            <!-- Actions and Notes -->
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
-                                <button type="button" class="btn btn-success">Share</button>
-                                <button type="button" class="btn btn-warning">Export</button>
-                                <a href="/move_samples/?sample_ids=${data.sample_id}" class="btn btn-primary" role="button">
-                                    Move Sample
-                                </a>
+                                <!-- Add More Divs as needed -->
+                                <!-- Actions and Notes -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                                    <button type="button" class="btn btn-success">Share</button>
+                                    <button type="button" class="btn btn-warning">Export</button>
+                                    <a href="/move_samples/?sample_ids=${data.sample_id}" class="btn btn-primary" role="button">
+                                        Move Sample
+                                    </a>
+                                </div>
                             </div>
                         </aside>
                     `;
@@ -124,6 +128,80 @@
                 });
             });
             $('.select2').select2();
+
+            $('#scanBarcodeModal').on('shown.bs.modal', function () {
+                $('#scannedBarcode').on('change', function () {
+                    $('#scanBarcodeForm').submit()
+                })
+            })
+            $('#scanBarcodeModal').on('shown.bs.modal', function () {
+                $('#scannedBarcode').on('change', function () {
+                    $('#scanBarcodeForm').submit()
+                });
+
+                $('#scanBarcodeForm').submit(function (e) {
+                    e.preventDefault();
+                    let barcode = document.getElementById('scannedBarcode').value;
+                    fetch('/api/check_barcode/', {
+                        method: 'POST',
+                        body: JSON.stringify({'barcode': barcode}),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.valid) {
+                                this.submit();
+                            } else {
+                                document.getElementById('barcodeError').style.display = 'block';
+                            }
+                        });
+                });
+            });
+            $('body').on('click', '.fa-plus', function (event) {
+                var elem = $(this).closest('.card.bg-light');
+                var x = elem.data('x');
+                var y = elem.data('y');
+
+                const barcode = prompt('Please scan the barcode');
+                let data = {
+                    'scannedBarcode': barcode,
+                    'box_id': '{{ box.box_name }}',
+                    'x': x,
+                    'y': y,
+                }
+
+                fetch('/add-sample/', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                }).then(response => response.json())
+                    .then(response => {
+                        if (response.success) {
+                            alert("Sample added successfully");
+                            location.reload();
+                        } else {
+                            alert("Failed to add sample: " + response.error);
+                        }
+                    }).catch((error) => {
+                    console.error("Error:", error);
+                });
+            });
+            $('#toggle-switch').change(function () {
+                if (this.checked) {
+                    $('#table-container').hide();
+                    $('#cards-container').show();
+                } else {
+                    $('#cards-container').hide();
+                    $('#table-container').show();
+                }
+            }).change();
+
         });
     </script>
 
@@ -137,6 +215,21 @@
             min-height: 100vh;
             margin: 0;
         }
+
+        .modal-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
     </style>
 {% endblock %}
 
@@ -146,28 +239,33 @@
            class="breadcrumb-item">
             <i class="fas fa-warehouse"></i>
             {{ box.location.facility.facility_name }}
+            (Facility)
         </a>
     {% endif %}
     {% if box.location.freezer %}
         <a href="{% url 'freezer_detail' box.location.freezer.id %}"
            class="breadcrumb-item">
             <i class="fas fa-snowflake"></i>{{ box.location.freezer.freezer_name }}
+            (Freezer)
         </a>
     {% endif %}
     {% if box.location.shelf %}
         <i class="fas fa-layer-group"></i>
         <a href="{% url 'shelf_detail' box.location.shelf.id %}" class="breadcrumb-item">
             <i class="fas fa-layer-group"></i>{{ box.location.shelf.shelf_name }}
+            (Shelf)
         </a>
     {% endif %}
     {% if box.location.rack %}
         <a href="{% url 'rack_detail' box.location.rack.id %}" class="breadcrumb-item">
             <i class="fas fa-box-open"></i>{{ box.location.rack.rack_name }}
+            (Rack)
         </a>
     {% endif %}
 
     <span class="breadcrumb-item active">
         <i class="fas fa-cube"></i> {{ box.box_name }}
+    (Box)
     </span>
 {% endblock %}
 
@@ -185,96 +283,107 @@
 {% endblock %}
 
 {% block page_content %}
-    <form id="bulk-actions-form" method="post">
-        {% csrf_token %}
-        <input type="hidden" id="selected-action" name="action">
-        <div class="d-flex flex-row align-items-center">
-            <div class="d-flex m-1">
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#moveBoxModal">
-                    Move Box
+    <div class="row">
+        <form id="bulk-actions-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="selected-action" name="action">
+            <div class="d-flex flex-row align-items-center">
+                <div class="d-flex m-1">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#moveBoxModal">
+                        Move Box
+                    </button>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#scanBarcodeModal">Move Samples
                 </button>
+                <div class="d-flex m-1">
+                    <button class="btn btn-outline-dark dropdown-toggle" type="button"
+                            id="bulk-actions-dropdown" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false"
+                            style="height: 2.5rem">
+                        ---Other Action---
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="bulk-actions-dropdown">
+                        <button class="dropdown-item" type="button" value="export">Export
+                        </button>
+                        {% for status in sample_statuses %}
+                            {% if not status.name == 'In Storage' %}
+                                <button class="dropdown-item" type="button"
+                                        value="{{ status.id }}">
+                                    {{ status.name }}
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                        <button class="dropdown-item" type="button" value="print">Printing
+                            Barcodes or Labels
+                        </button>
+                    </div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="toggle-switch">
+                    <label class="form-check-label" for="toggle-switch">Show Box
+                        View</label>
+                </div>
             </div>
-            <div class="d-flex m-1">
-                <button class="btn btn-outline-dark dropdown-toggle" type="button"
-                        id="bulk-actions-dropdown" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="height: 2.5rem">
-                    ---Other Action---
-                </button>
-
-                <div class="dropdown-menu" aria-labelledby="bulk-actions-dropdown">
-                    <button class="dropdown-item" type="button" value="move">Move
-                        Samples
-                    </button>
-                    <button class="dropdown-item" type="button" value="export">Export
-                    </button>
-                    {% for status in sample_statuses %}
-                        {% if not status.name == 'In Storage' %}
-                            <button class="dropdown-item" type="button"
-                                    value="{{ status.id }}">
-                                {{ status.name }}
-                            </button>
+            <div id="table-container" class="table-responsive">
+                {{ tableHTML|safe }}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if positions.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ positions.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;&laquo;</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
                         {% endif %}
-                    {% endfor %}
-                    <button class="dropdown-item" type="button" value="print">Printing
-                        Barcodes or Labels
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="d-flex flex-column mt-4">
-            <div class="row">
-                <div class="card d-flex align-items-center justify-content-center"
-                     style="margin: 3px; height: 4rem; width: 4rem;">
-                    <input type="checkbox" id="select-all">
-                </div>
-                {% for x in x_labels %}
-                    <div class="card" style="margin: 3px; height: 4rem; width: 4rem;">
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            {{ x }}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            {% for y in y_labels %}
-                <div class="row">
-                    <div class="card" style="margin: 3px; height: 4rem; width: 4rem;">
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            {{ y }}
-                        </div>
-                    </div>
-                    {% for x in x_labels %}
-                        <div class="card bg-light"
-                             style="margin: 3px; height: 4rem; width: 4rem;">
-                            <div class="card-body d-flex flex-column align-items-center justify-content-center"
-                                 style="padding: 0">
-                                {% for position in positions %}
-                                    {% if position.x_position == forloop.parentloop.counter0 and position.y_position == y %}
-                                        <input type="checkbox" name="sample_ids"
-                                               value="{{ position.sample.sample_id }}">
-                                        <a class="text-center " style="font-size: 9px"
-                                           href="#" data-bs-toggle="offcanvas"
-                                           data-bs-target="#sampleDetailsDrawer">
-                                            <i class="fas fa-vial"></i>
-                                            {{ position.sample.sample_id }}
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        </div>
-    </form>
 
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="sampleDetailsDrawer">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Sample Details</h5>
-            <button type="button" class="btn-close text-reset"
-                    data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body" id="sampleDetailsBody"></div>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">
+                                {{ positions.number }} of {{ positions.paginator.num_pages }} <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+
+                        {% if positions.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ positions.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ positions.paginator.num_pages }}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+
+            <div id="cards-container" class="row">
+                {{ boxHTML|safe }}
+                <div class="col-lg-3" id="sampleDetailsBody"></div>
+            </div>
+        </form>
     </div>
 
     <div class="modal fade" id="moveBoxModal" tabindex="-1"
@@ -285,7 +394,7 @@
                 <div class="modal-content rounded" style="width: 50rem">
                     <div class="modal-header">
                         <h5 class="modal-title" id="moveBoxModalLabel">Move Box</h5>
-                        <button type="button" class="close" data-dismiss="modal"
+                        <button type="button" class="close" data-bs-dismiss="modal"
                                 aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -311,7 +420,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">Close
+                                data-bs-dismiss="modal">Close
                         </button>
                         <button type="submit" class="btn btn-primary">Move</button>
                     </div>
@@ -319,4 +428,40 @@
             </form>
         </div>
     </div>
+
+    <div class="modal fade" id="scanBarcodeModal" tabindex="-1"
+         aria-labelledby="scanBarcodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scanBarcodeModalLabel">Scan Barcode</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="scanBarcodeForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="scannedBarcode" class="form-label">Scan or enter
+                                barcode</label>
+                            <input type="text" class="form-control" id="scannedBarcode"
+                                   name="scannedBarcode" autofocus>
+                            <div id="barcodeError" style="display: none; color: red;">
+                                No such sample
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="submit" form="scanBarcodeForm" class="btn btn-primary"
+                            id="submitBtn">Move Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

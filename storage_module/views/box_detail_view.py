@@ -1,7 +1,9 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.generic import DetailView
 
@@ -26,12 +28,6 @@ class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
         action = request.POST.get('action')
         selected_samples = request.POST.getlist('sample_ids')
 
-        if action == 'move':
-            base_url = reverse('move_samples')
-            query_string = urlencode({'sample_ids': ','.join(selected_samples)})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
         if action in self.sample_types:
             for sample_id in selected_samples:
                 update_sample_status(sample_id=sample_id, status=action)
@@ -43,6 +39,14 @@ class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
             printer = BarcodePrinter()
             printer.print_barcode_for_selected_samples(selected_samples)
 
+        sample_id = request.POST.get('scannedBarcode')
+
+        if sample_id:
+            base_url = reverse('move_samples')
+            query_string = urlencode({'sample_ids': sample_id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         if form.is_valid():
             box = self.get_object()
             box.freezer = form.cleaned_data.get('freezer')
@@ -53,9 +57,20 @@ class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['boxHTML'] = ''
+        context['tableHTML'] = ''
 
         box = self.object
         positions = box.positions.order_by('x_position', 'y_position')
+
+        paginator = Paginator(positions, 10)
+        page = self.request.GET.get('page')
+        paginated_positions = paginator.get_page(page)
+
+        positions_dict = {position.x_position: {} for position in positions}
+
+        for position in positions:
+            positions_dict[position.x_position][position.y_position] = position.sample
 
         location = getattr(box, 'location', None)
 
@@ -88,9 +103,21 @@ class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
             move_box_form=move_box_form,
             x_labels=x_labels,
             y_labels=y_labels,
+            positions_dict=positions_dict,
             sample_statuses=self.sample_statuses,
             sample_types=self.sample_types,
         )
+        boxHTML = render_to_string('storage_module/box_view.html',
+                                   {
+                                       'x_labels': x_labels,
+                                       'y_labels': y_labels,
+                                       'positions_dict': positions_dict,
+                                   })
+        tableHTML = render_to_string('storage_module/box_table.html',
+                                     {'positions': paginated_positions})
+
+        context['boxHTML'] += boxHTML
+        context['tableHTML'] += tableHTML
 
         return context
 

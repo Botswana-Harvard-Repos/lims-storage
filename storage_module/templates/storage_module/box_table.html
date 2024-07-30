@@ -1,0 +1,49 @@
+<table id="table " class="table table-striped mt-2" style="width:120%; overflow:auto;">
+    <thead class="thead-dark">
+    <tr>
+        <th><input type="checkbox" id="select-all"></th>
+        <th>ID</th>
+        <th>Protocol Number</th>
+        <th>TID</th>
+        <th>Participant ID</th>
+        <th>Gender</th>
+        <th>Date of Birth</th>
+        <th>Date Sampled</th>
+        <th>Time Sampled</th>
+        <th>Sample Condition</th>
+        <th>User Created</th>
+        <th>Cinitials</th>
+        <th>Visit Code</th>
+        <th>Requisition ID</th>
+        <th>Sample Type</th>
+        <th>Source File</th>
+        <th>Sample Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for position in positions %}
+        <tr>
+            <td>
+                <input type="checkbox" name="sample_ids"
+                       value="{{ position.sample.sample_id }}">
+            </td>
+            <td>{{ position.sample.sample_id }}</td>
+            <td>{{ position.sample.protocol_number }}</td>
+            <td>{{ position.sample.tid }}</td>
+            <td>{{ position.sample.participant_id }}</td>
+            <td>{{ position.sample.gender }}</td>
+            <td>{{ position.sample.date_of_birth }}</td>
+            <td>{{ position.sample.date_sampled }}</td>
+            <td>{{ position.sample.time_sampled }}</td>
+            <td>{{ position.sample.sample_condition }}</td>
+            <td>{{ position.sample.user_created }}</td>
+            <td>{{ position.sample.cinitials }}</td>
+            <td>{{ position.sample.visit_code }}</td>
+            <td>{{ position.sample.requisition_id }}</td>
+            <td>{{ position.sample.sample_type.sample_type }}</td>
+            <td>{{ position.sample.source_file.source_file_name }}</td>
+            <td>{{ position.sample.sample_status.name }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
