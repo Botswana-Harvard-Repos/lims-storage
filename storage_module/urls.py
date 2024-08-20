@@ -47,6 +47,7 @@ urlpatterns = [
     path('add-sample/', views.add_samples, name='add_sample'),
     path('ajax/validate_position/', views.ajax_validate_position,
          name='ajax_validate_position'),
+    path('get-sample-position/', views.get_sample_position, name='get_sample_position'),
     path('api/check_barcode/', views.check_barcode, name='check_barcode'),
     path('reports/', HomeView.as_view(), name='reports_url'),
     path('dashboard/', DashboardView.as_view(), name='dashboard_url'),

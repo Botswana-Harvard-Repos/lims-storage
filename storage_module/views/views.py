@@ -138,6 +138,28 @@ def check_barcode(request):
     return JsonResponse({'valid': exists})
 
 
+def get_sample_position(request):
+    barcode = request.GET.get('barcode')
+
+    if barcode is not None:
+        try:
+            position = BoxPosition.objects.get(sample__sample_id=barcode)
+            box_id = position.box.box_name if position.box else None
+            x = position.x_position
+            y = position.y_position
+        except BoxPosition.DoesNotExist:
+            return JsonResponse(
+                {'success': False,
+                 'error': 'This sample was does not exist in the system '
+                          'database'})
+
+        return JsonResponse(
+            {'success': True, 'box': box_id, 'x': x, 'y': y})
+
+    else:
+        return JsonResponse({'success': False, 'error': 'No barcode provided.'})
+
+
 def add_samples(request):
     data = json.loads(request.body)
     barcode = data.get('scannedBarcode')
@@ -152,7 +174,8 @@ def add_samples(request):
         position = BoxPosition.objects.get(sample__sample_id=barcode)
     except BoxPosition.DoesNotExist:
         return JsonResponse(
-            {'success': False, 'error': 'No position found for this barcode.'})
+            {'success': False, 'error': 'This sample was does not exist in the system '
+                                        'database'})
 
     try:
         box = DimBox.objects.get(box_name=box_id)

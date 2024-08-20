@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import Q
 
 from storage_module.models import DimBox, DimFacility, DimFreezer, DimRack, \
-    DimSample, DimShelf
+    DimSample, DimSampleStatus, DimSampleType, DimShelf, DimSourceFile
 
 
 class MoveSampleForm(forms.Form):
@@ -108,3 +108,24 @@ class SampleMoveForm(forms.Form):
     class Meta:
         model = DimSample
         fields = ('sample_id',)
+
+
+class AdvancedSamplesFilterForm(forms.Form):
+    sample_id = forms.CharField(max_length=255, required=False)
+    protocol_number = forms.CharField(max_length=255, required=False)
+    participant_id = forms.CharField(max_length=255, required=False)
+    gender = forms.CharField(max_length=255, required=False)
+    date_of_birth = forms.DateField(required=False)
+    date_sampled = forms.DateField(required=False)
+    sample_condition = forms.CharField(max_length=255, required=False)
+    user_created = forms.CharField(max_length=255, required=False)
+    visit_code = forms.CharField(max_length=255, required=False)
+    requisition_id = forms.CharField(max_length=255, required=False)
+    sample_type = forms.ModelChoiceField(queryset=DimSampleType.objects.all(),
+                                         required=False)
+    source_file = forms.ModelChoiceField(queryset=DimSourceFile.objects.all(),
+                                         required=False)
+    sample_status = forms.ModelChoiceField(queryset=DimSampleStatus.objects.all(),
+                                           required=False)
+    box = forms.ModelChoiceField(queryset=DimBox.objects.all(), required=False)
+    facility = forms.ModelChoiceField(queryset=DimFacility.objects.all(), required=False)

@@ -67,10 +67,10 @@ class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
         page = self.request.GET.get('page')
         paginated_positions = paginator.get_page(page)
 
-        positions_dict = {position.x_position: {} for position in positions}
+        positions_dict = {position.x_position + 1: {} for position in positions}
 
         for position in positions:
-            positions_dict[position.x_position][position.y_position] = position.sample
+            positions_dict[position.x_position + 1][position.y_position] = position.sample
 
         location = getattr(box, 'location', None)
 

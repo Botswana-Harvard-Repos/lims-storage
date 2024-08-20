@@ -61,6 +61,37 @@
             min-height: 100vh;
             margin: 0;
         }
+        .fullscreen-form {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 9999;
+            padding: 20px;
+            display: flex;
+            align-items: center;  /* centers the form vertically */
+            justify-content: center; /* centers the form horizontally */
+        }
+
+        .fullscreen-form .card {
+            width: 80%;  /* makes the form take 80% of the screen width */
+        }
+
+        .fullscreen-form form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;  /* rounds corners of form */
+        }
+
+        .fullscreen-form table {
+            width: 100%;
+        }
+
+        .fullscreen-form td {
+            padding: 10px 0; /* add some vertical padding to form inputs */
+        }
     </style>
 {% endblock %}
 
@@ -71,8 +102,7 @@
             {% csrf_token %}
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex mr-5 input-group">
-                    <select class="custom-select" id="bulk-actions-dropdown" name="action"
-                            required>
+                    <select class="custom-select" id="bulk-actions-dropdown" name="action">
                         <option value="" selected>---Select Action---</option>
                         <option value="export">Export</option>
                         {% for status in sample_statuses %}
@@ -87,71 +117,21 @@
                 </div>
                 <!-- Filters -->
                 <div class="d-flex align-items-end gap-3">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button"
-                                id="filter-sample-type" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            Sample Type
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="filter-sample-type">
-                            <li><a class="dropdown-item" href="{% url 'samples_url' %}">--
-                                All --</a></li>
-                            {% for type in sample_types %}
-                                <li><a class="dropdown-item"
-                                       href="?sample_type={{ type }}">{{ type }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button"
-                                id="filter-box" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            Box
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="filter-box">
-                            <li><a class="dropdown-item" href="{% url 'samples_url' %}">--
-                                All --</a></li>
-                            {% for box in boxes %}
-                                <li><a class="dropdown-item"
-                                       href="?box={{ box }}">{{ box }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button"
-                                id="filter-facility" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            Facility
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="filter-facility">
-                            <li><a class="dropdown-item" href="{% url 'samples_url' %}">--
-                                All --</a></li>
-                            {% for facility in facilities %}
-                                <li><a class="dropdown-item"
-                                       href="?facility={{ facility }}">{{ facility }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button"
-                                id="filter-file" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            Source File
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="filter-file">
-                            <li><a class="dropdown-item" href="{% url 'samples_url' %}">--
-                                All --</a></li>
-                            {% for file in source_files %}
-                                <li><a class="dropdown-item"
-                                       href="?file={{ file }}">{{ file }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <button class="btn btn-primary" type="button" data-toggle="collapse"
+                            data-target="#advancedFilterForm" aria-expanded="false"
+                            aria-controls="advancedFilterForm">
+                        Advanced Filter
+                    </button>
+                </div>
+            </div>
+            <!-- Advanced Filter Form -->
+            <div class="collapse fullscreen-form" id="advancedFilterForm">
+                <div class="card card-body bg-light">
+                    <h2 class="text-center mb-4">Advanced Filter Form</h2>
+                    <form action="" method="GET" class="p-4 rounded bg-white shadow">
+                        {{ advanced_filter_form.as_table }}
+                        <input type="submit" class="btn btn-primary btn-block mt-4" value="Filter">
+                    </form>
                 </div>
             </div>
             <!-- Table -->

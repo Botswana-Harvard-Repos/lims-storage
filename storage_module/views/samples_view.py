@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
+from storage_module.forms import AdvancedSamplesFilterForm
 from storage_module.models import DimBox, DimFacility, DimSample, DimSampleStatus, \
     DimSampleType, DimSourceFile
 from storage_module.util import update_sample_status
@@ -15,14 +16,10 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         query = self.request.GET.get('search')
-        sample_type = self.request.GET.get('sample_type')
-        box = self.request.GET.get('box')
-        facility = self.request.GET.get('facility')
+        advanced_filter_form = AdvancedSamplesFilterForm(self.request.GET)
+        samples_list = self.get_samples_from_db(advanced_filter_form)
         row_number = int(self.request.POST.get('rows', 10))
-        samples_list = self.get_samples_from_db(
-            query=None, sample_type=None, box=None, facility=None)
         total_samples = len(samples_list)
-        samples_list = self.get_samples_from_db(query, sample_type, box, facility)
         page_number = self.request.GET.get('page')
         paginator = Paginator(samples_list, row_number)
 
@@ -33,6 +30,7 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
             boxes=self.boxes,
             facilities=self.facilities,
             source_files=self.source_files,
+            advanced_filter_form = advanced_filter_form,
             total_samples=total_samples,
             rows_options=[10, 25, 50, 100, 1000, 10000],
         )
@@ -79,26 +77,12 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
             sample.save()
         return self.render_to_response(context)
 
-    @staticmethod
-    def get_samples_from_db(query=None, sample_type=None, box=None, facility=None):
-        queryset = DimSample.objects.values(
-            'sample_id',
-            'sample_type__sample_type',
-            'box_position__box__freezer__facility__facility_name',
-            'box_position__box__freezer__facility__id',
-            'source_file__source_file_name',
-            'box_position__box__box_name',
-            'box_position__box__id',
-            'date_sampled',
-            'sample_status__name'
-        )
-        if query:
-            queryset = queryset.filter(sample_id__icontains=query)
-        if sample_type and sample_type != 'all':
-            queryset = queryset.filter(sample_type__sample_type=sample_type)
-        if box and box != 'all':
-            queryset = queryset.filter(box_position__box__box_name=box)
-        if facility and facility != 'all':
-            queryset = queryset.filter(
-                box_position__box__freezer__facility__facility_name=facility)
+    def get_samples_from_db(self, advanced_filter_form):
+        queryset = DimSample.objects.all()
+
+        if advanced_filter_form.is_valid():
+            for field in advanced_filter_form:
+                if field.value():
+                    queryset = queryset.filter(**{field.name: field.value()})
+
         return queryset
