@@ -121,11 +121,24 @@ class AdvancedSamplesFilterForm(forms.Form):
     user_created = forms.CharField(max_length=255, required=False)
     visit_code = forms.CharField(max_length=255, required=False)
     requisition_id = forms.CharField(max_length=255, required=False)
-    sample_type = forms.ModelChoiceField(queryset=DimSampleType.objects.all(),
-                                         required=False)
-    source_file = forms.ModelChoiceField(queryset=DimSourceFile.objects.all(),
-                                         required=False)
-    sample_status = forms.ModelChoiceField(queryset=DimSampleStatus.objects.all(),
-                                           required=False)
-    box = forms.ModelChoiceField(queryset=DimBox.objects.all(), required=False)
-    facility = forms.ModelChoiceField(queryset=DimFacility.objects.all(), required=False)
+    sample_type__id = forms.ModelChoiceField(
+        label='Sample Type',
+        queryset=DimSampleType.objects.all(),
+        required=False)
+    source_file__id = forms.ModelChoiceField(
+        label='Source File',
+        queryset=DimSourceFile.objects.all(),
+        required=False)
+    sample_status__id = forms.ModelChoiceField(
+        label='Sample Status',
+        queryset=DimSampleStatus.objects.all(),
+        required=False)
+    box_position__box__id = forms.ModelChoiceField(
+        label='Box Name',
+        queryset=DimBox.objects.all(), required=False)
+    box_position__box__freezer__id = forms.ModelChoiceField(
+        label='Freezer',
+        queryset=DimFreezer.objects.all(), required=False)
+    box_position__box__freezer__facility__id = forms.ModelChoiceField(
+        label='Facility',
+        queryset=DimFacility.objects.all(), required=False)

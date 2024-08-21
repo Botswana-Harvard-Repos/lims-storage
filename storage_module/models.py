@@ -17,6 +17,9 @@ class DimFacility(models.Model):
 class DimSampleType(models.Model):
     sample_type = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return self.sample_type
+
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimsampletype'
@@ -25,6 +28,9 @@ class DimSampleType(models.Model):
 class DimSourceFile(models.Model):
     source_file_name = models.CharField(max_length=100)
     source_file_description = models.TextField(null=True)
+
+    def __str__(self):
+        return self.source_file_name
 
     class Meta:
         app_label = 'storage_module'
@@ -40,6 +46,9 @@ class BoxPosition(models.Model):
     y_position = models.CharField(verbose_name="Y Position",
                                   max_length=255,
                                   help_text='Vertical position in the box grid')
+
+    def __str__(self):
+        return f'({self.x_position}, {self.y_position})'
 
     class Meta:
         app_label = 'storage_module'
@@ -102,6 +111,9 @@ class DimTime(models.Model):
     time_of_day = models.CharField(max_length=50)
     day_of_week = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.time_sampled
+
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimtime'
@@ -110,6 +122,9 @@ class DimTime(models.Model):
 class DimSampleStatus(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         app_label = 'storage_module'

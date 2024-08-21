@@ -1,0 +1,96 @@
+{% load widget_tweaks %}
+
+<!-- Trigger Button -->
+<div class="d-flex align-items-end gap-3">
+    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#advancedFilterModal">
+        <i class="bi bi-funnel"></i> Advanced Filter
+    </button>
+</div>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="advancedFilterModal" tabindex="-1" aria-labelledby="advancedFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="advancedFilterModalLabel">Advanced Filter Form</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <form id="advancedFilterFormId" action="" method="GET" class="p-4 rounded bg-white shadow" name="advanced_filter">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="sample_id">Sample ID</label>
+                            {% render_field advanced_filter_form.sample_id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="protocol_number">Protocol Number</label>
+                            {% render_field advanced_filter_form.protocol_number class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="participant_id">Participant ID</label>
+                            {% render_field advanced_filter_form.participant_id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gender">Gender</label>
+                            {% render_field advanced_filter_form.gender class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date_of_birth">Date of Birth</label>
+                            {% render_field advanced_filter_form.date_of_birth class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date_sampled">Date Sampled</label>
+                            {% render_field advanced_filter_form.date_sampled class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sample_condition">Sample Condition</label>
+                            {% render_field advanced_filter_form.sample_condition class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="user_created">User Created</label>
+                            {% render_field advanced_filter_form.user_created class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="visit_code">Visit Code</label>
+                            {% render_field advanced_filter_form.visit_code class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="requisition_id">Requisition ID</label>
+                            {% render_field advanced_filter_form.requisition_id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sample_type__id">Sample Type</label>
+                            {% render_field advanced_filter_form.sample_type__id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="source_file__id">Source File</label>
+                            {% render_field advanced_filter_form.source_file__id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sample_status__id">Sample Status</label>
+                            {% render_field advanced_filter_form.sample_status__id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="box_position__box__id">Box Name</label>
+                            {% render_field advanced_filter_form.box_position__box__id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="box_position__box__freezer__id">Freezer</label>
+                            {% render_field advanced_filter_form.box_position__box__freezer__id class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="box_position__box__freezer__facility__id">Facility</label>
+                            {% render_field advanced_filter_form.box_position__box__freezer__facility__id class="form-control" %}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" class="btn btn-primary" value="Filter">
+                        <button type="reset" class="btn btn-secondary ms-2" id="reset-button">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

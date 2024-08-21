@@ -78,11 +78,20 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
         return self.render_to_response(context)
 
     def get_samples_from_db(self, advanced_filter_form):
-        queryset = DimSample.objects.all()
+        queryset = DimSample.objects.values(
+            'sample_id',
+            'sample_type__sample_type',
+            'box_position__box__freezer__facility__facility_name',
+            'box_position__box__freezer__facility__id',
+            'source_file__source_file_name',
+            'box_position__box__box_name',
+            'box_position__box__id',
+            'date_sampled',
+            'sample_status__name'
+        )
 
-        if advanced_filter_form.is_valid():
-            for field in advanced_filter_form:
-                if field.value():
-                    queryset = queryset.filter(**{field.name: field.value()})
+        for field in advanced_filter_form:
+            if field.value():
+                queryset = queryset.filter(**{field.name: field.value()})
 
         return queryset
