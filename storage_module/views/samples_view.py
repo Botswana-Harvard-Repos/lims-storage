@@ -22,6 +22,12 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
         total_samples = len(samples_list)
         page_number = self.request.GET.get('page')
         paginator = Paginator(samples_list, row_number)
+        page_obj = paginator.get_page(page_number)
+        # Pagination info
+        total_count = paginator.count           # Total number of items
+        items_on_current_page = len(page_obj)  # Get the number of items on this page
+        start_index = page_obj.start_index()   # First item index
+        end_index = start_index + items_on_current_page - 1 
 
         context.update(
             samples=paginator.get_page(page_number),
@@ -33,6 +39,10 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
             advanced_filter_form = advanced_filter_form,
             total_samples=total_samples,
             rows_options=[10, 25, 50, 100, 1000, 10000],
+            total_count =total_count,
+            page_obj=page_obj,
+            start_index=start_index,
+            end_index=end_index
         )
         return context
 

@@ -37,8 +37,10 @@ class RackDetailView(LoginRequiredMixin, DetailView):
             container['stored_samples'] for container in context['inside_freezer'])
         total_capacity = sum(
             container['capacity'] for container in context['inside_freezer'])
+        total_space_avail = total_capacity - total_samples
 
         context["total_samples"] = total_samples
+        context['total_space_avail'] =total_space_avail
         context["total_capacity"] = total_capacity
         context["percent_filled"] = (total_samples / total_capacity) * 100 if (
             total_capacity) else 0

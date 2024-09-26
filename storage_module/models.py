@@ -168,6 +168,7 @@ class DimSample(models.Model):
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
+        self.protocol_number = self.protocol_number.replace(" ", "").upper()
         if self.sample_status and self.sample_status.name not in ['In Storage',
                                                                   'Archived']:
             BoxPosition.objects.filter(sample_id=self.sample_id).delete()

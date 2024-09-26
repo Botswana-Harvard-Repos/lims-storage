@@ -21,14 +21,21 @@
             });
 
             $('#select-all').change(function () {
-                $('input[type="checkbox"][name="sample_ids"]').prop('checked', $(this).is(':checked'));
+                const isChecked = $(this).is(':checked');
+                $('input[type="checkbox"][name="sample_ids"]').prop('checked', isChecked);
             });
 
+            // Ensure "select all" gets untoggled if any individual checkbox is unchecked
             $('input[type="checkbox"][name="sample_ids"]').change(function () {
-                if (!$(this).is(':checked')) {
-                    $('#select-all').prop('checked', false);
-                }
+                const allCheckboxes = $('input[type="checkbox"][name="sample_ids"]');
+                const checkedCheckboxes = allCheckboxes.filter(':checked').length;
+                const isAllChecked = checkedCheckboxes === allCheckboxes.length;
+                $('#select-all').prop('checked', isAllChecked);
             });
+             // Ensure the select-all checkbox is correctly checked/unchecked on page load
+                const allCheckboxes = $('input[type="checkbox"][name="sample_ids"]');
+                const checkedCheckboxes = allCheckboxes.filter(':checked').length;
+                $('#select-all').prop('checked', checkedCheckboxes === allCheckboxes.length);
 
             $('a[data-bs-toggle="offcanvas"]').on('click', function (event) {
                 event.preventDefault();
@@ -220,6 +227,19 @@
                     $('#table-container').show();
                 }
             }).change();
+        
+            $('#confirm-move-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the form from submitting immediately
+        
+                // Show a confirmation dialog
+                const userConfirmed = confirm("Are you sure you want to move the box");
+                
+                if (userConfirmed) {
+                    // If the user confirms, submit the form
+                    $(this).closest('form').submit();
+                } 
+                // If the user clicks "Cancel", nothing happens and the form is not submitted
+            });
 
         });
     </script>
@@ -453,7 +473,7 @@
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Close
                         </button>
-                        <button type="submit" class="btn btn-primary">Move</button>
+                        <button type="submit" class="btn btn-primary" id="confirm-move-button">Move Box</button>
                     </div>
                 </div>
             </form>

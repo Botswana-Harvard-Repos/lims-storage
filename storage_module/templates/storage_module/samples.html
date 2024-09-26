@@ -30,6 +30,7 @@
                 paging: false,
                 scrollCollapse: true,
                 scrollY: '60vh',
+                info:"",
                 columnDefs: [
                     {targets: 0, orderable: false},  // Disables sorting on the first column
                     {targets: 8, orderable: false}  // Disables sorting on the last column
@@ -245,6 +246,9 @@
                                             {{ number }}</option>
                                     {% endfor %}
                                 </select>
+                                <div>
+                                    Showing {{ start_index }} to {{ end_index }} of {{ total_count }} entries
+                                </div>
                             </form>
                         </td>
                     </tr>

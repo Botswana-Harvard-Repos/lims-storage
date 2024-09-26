@@ -112,11 +112,18 @@ class SampleMoveForm(forms.Form):
 
 class AdvancedSamplesFilterForm(forms.Form):
     sample_id = forms.CharField(max_length=255, required=False)
-    protocol_number = forms.CharField(max_length=255, required=False)
+    protocol_number = forms.ModelChoiceField(
+        label='Protocol number',
+        queryset=DimSample.objects.values_list('protocol_number', flat=True).distinct(),
+        required=False)
+    #forms.CharField(max_length=255, required=False)
     participant_id = forms.CharField(max_length=255, required=False)
-    gender = forms.CharField(max_length=255, required=False)
-    date_of_birth = forms.DateField(required=False)
-    date_sampled = forms.DateField(required=False)
+    gender = forms.ChoiceField(
+        choices=[('',''),('F','F'),('M','M')],
+        widget=forms.Select,
+        required=False,)
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),required=False)
+    date_sampled = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),required=False)
     sample_condition = forms.CharField(max_length=255, required=False)
     user_created = forms.CharField(max_length=255, required=False)
     visit_code = forms.CharField(max_length=255, required=False)
