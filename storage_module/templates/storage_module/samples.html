@@ -25,6 +25,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const exportOptions = {
+                columns: ':not(:first-child,:last-child)',}
+
             $('#samples-table').DataTable({
                 dom: 'Bfrtip',
                 paging: false,
@@ -38,27 +41,19 @@
                 buttons: [
                     {
                         extend: 'copy',
-                        exportOptions: {
-                            columns: ':not(:first-child,:last-child)'  // Excludes the first and the last column from the export
-                        }
+                        exportOptions: exportOptions
                     },
                     {
                         extend: 'csv',
-                        exportOptions: {
-                            columns: ':not(:first-child,:last-child)'  // Excludes the first and the last column from the export
-                        }
+                        exportOptions: exportOptions
                     },
                     {
                         extend: 'excel',
-                        exportOptions: {
-                            columns: ':not(:first-child,:last-child)'  // Excludes the first and the last column from the export
-                        }
+                        exportOptions: exportOptions
                     },
                     {
                         extend: 'pdf',
-                        exportOptions: {
-                            columns: ':not(:first-child,:last-child)'  // Excludes the first and the last column from the export
-                        }
+                        exportOptions: exportOptions
                     },
                     'print'
                 ]
@@ -173,6 +168,7 @@
                         <th>Sample ID</th>
                         <th>Sample Type</th>
                         <th>Facility Name</th>
+                        <th>Freeze Name</th>
                         <th>Source File Name</th>
                         <th>Box Name</th>
                         <th>Time Sampled</th>
@@ -193,6 +189,11 @@
                                     {{ sample.box_position__box__freezer__facility__facility_name }}
                                 </a>
                             </td>
+                            <td>
+                                <a href="{% if sample.box_position__box__id %} {% url 'freezer_data' sample.box_position__box__freezer__id %} {% endif %}">
+                                    {{ sample.box_position__box__freezer__freezer_name }}
+                                </a>
+                            </td>
                             <td>{{ sample.source_file__source_file_name }}</td>
                             <td>
                                 <a href="{% if sample.box_position__box__id %} {% url 'box_detail' sample.box_position__box__id %} {% endif %}">
@@ -200,24 +201,8 @@
                                 </a>
                             </td>
                             <td>{{ sample.date_sampled }}</td>
-                            <td id="sampleStatus{{ sample.sample_id }}">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle"
-                                            type="button"
-                                            id="dropdownSampleButton{{ sample.sample_id }}"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                        {{ sample.sample_status__name }}
-                                    </button>
-                                    <ul class="dropdown-menu"
-                                        aria-labelledby="dropdownSampleButton{{ sample.sample_id }}">
-                                        {% for status in sample_statuses %}
-                                            <li><a class="dropdown-item"
-                                                   href="{% url 'samples_url' %}?sample_id={{ sample.sample_id }}&sample_status={{ status.id }}">{{ status.name }}</a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+                            <td >
+                            {{ sample.sample_status__name }}
                             </td>
                             <td>
                                 <a href="{% url 'sample_detail' sample_id=sample.sample_id %}">Dashboard</a>
@@ -263,7 +248,7 @@
                         <!-- First Page Link -->
                         {% if samples.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1" aria-label="First">
+                                <a class="page-link" href="?page=1{% if request.GET.sample_id %}&sample_id={{ request.GET.sample_id }}{% endif %}{% if request.GET.protocol_number %}&protocol_number={{ request.GET.protocol_number }}{% endif %}{% if request.GET.participant_id %}&participant_id={{ request.GET.participant_id }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.date_of_birth_start %}&date_of_birth_start={{ request.GET.date_of_birth_start }}{% endif %}{% if request.GET.date_of_birth_end %}&date_of_birth_end={{ request.GET.date_of_birth_end }}{% endif %}{% if request.GET.date_sampled_start %}&date_sampled_start={{ request.GET.date_sampled_start }}{% endif %}{% if request.GET.date_sampled_end %}&date_sampled_end={{ request.GET.date_sampled_end }}{% endif %}{% if request.GET.sample_condition %}&sample_condition={{ request.GET.sample_condition }}{% endif %}{% if request.GET.user_created %}&user_created={{ request.GET.user_created }}{% endif %}{% if request.GET.visit_code %}&visit_code={{ request.GET.visit_code }}{% endif %}{% if request.GET.requisition_id %}&requisition_id={{ request.GET.requisition_id }}{% endif %}{% if request.GET.sample_type__id %}&sample_type__id={{ request.GET.sample_type__id }}{% endif %}{% if request.GET.source_file__id %}&source_file__id={{ request.GET.source_file__id }}{% endif %}{% if request.GET.sample_status__id %}&sample_status__id={{ request.GET.sample_status__id }}{% endif %}{% if request.GET.box_position__box__id %}&box_position__box__id={{ request.GET.box_position__box__id }}{% endif %}{% if request.GET.box_position__box__freezer__id %}&box_position__box__freezer__id={{ request.GET.box_position__box__freezer__id }}{% endif %}{% if request.GET.box_position__box__freezer__facility__id %}&box_position__box__freezer__facility__id={{ request.GET.box_position__box__freezer__facility__id }}{% endif %}"> 
                                     <span aria-hidden="true">&laquo; First</span>
                                 </a>
                             </li>
@@ -275,8 +260,7 @@
                                 <li class="page-item active"><a class="page-link"
                                                                 href="#">{{ i }}</a></li>
                             {% elif i > samples.number|add:"-3" and i < samples.number|add:"3" %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?page={{ i }}">{{ i }}</a>
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.sample_id %}&sample_id={{ request.GET.sample_id }}{% endif %}{% if request.GET.protocol_number %}&protocol_number={{ request.GET.protocol_number }}{% endif %}{% if request.GET.participant_id %}&participant_id={{ request.GET.participant_id }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.date_of_birth_start %}&date_of_birth_start={{ request.GET.date_of_birth_start }}{% endif %}{% if request.GET.date_of_birth_end %}&date_of_birth_end={{ request.GET.date_of_birth_end }}{% endif %}{% if request.GET.date_sampled_start %}&date_sampled_start={{ request.GET.date_sampled_start }}{% endif %}{% if request.GET.date_sampled_end %}&date_sampled_end={{ request.GET.date_sampled_end }}{% endif %}{% if request.GET.sample_condition %}&sample_condition={{ request.GET.sample_condition }}{% endif %}{% if request.GET.user_created %}&user_created={{ request.GET.user_created }}{% endif %}{% if request.GET.visit_code %}&visit_code={{ request.GET.visit_code }}{% endif %}{% if request.GET.requisition_id %}&requisition_id={{ request.GET.requisition_id }}{% endif %}{% if request.GET.sample_type__id %}&sample_type__id={{ request.GET.sample_type__id }}{% endif %}{% if request.GET.source_file__id %}&source_file__id={{ request.GET.source_file__id }}{% endif %}{% if request.GET.sample_status__id %}&sample_status__id={{ request.GET.sample_status__id }}{% endif %}{% if request.GET.box_position__box__id %}&box_position__box__id={{ request.GET.box_position__box__id }}{% endif %}{% if request.GET.box_position__box__freezer__id %}&box_position__box__freezer__id={{ request.GET.box_position__box__freezer__id }}{% endif %}{% if request.GET.box_position__box__freezer__facility__id %}&box_position__box__freezer__facility__id={{ request.GET.box_position__box__freezer__facility__id }}{% endif %}">{{ i }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -284,9 +268,7 @@
                         <!-- Last Page Link -->
                         {% if samples.has_next %}
                             <li class="page-item">
-                                <a class="page-link"
-                                   href="?page={{ samples.paginator.num_pages }}"
-                                   aria-label="Last">
+                                <a class="page-link" href="?page={{ samples.paginator.num_pages }}{% if request.GET.sample_id %}&sample_id={{ request.GET.sample_id }}{% endif %}{% if request.GET.protocol_number %}&protocol_number={{ request.GET.protocol_number }}{% endif %}{% if request.GET.participant_id %}&participant_id={{ request.GET.participant_id }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.date_of_birth_start %}&date_of_birth_start={{ request.GET.date_of_birth_start }}{% endif %}{% if request.GET.date_of_birth_end %}&date_of_birth_end={{ request.GET.date_of_birth_end }}{% endif %}{% if request.GET.date_sampled_start %}&date_sampled_start={{ request.GET.date_sampled_start }}{% endif %}{% if request.GET.date_sampled_end %}&date_sampled_end={{ request.GET.date_sampled_end }}{% endif %}{% if request.GET.sample_condition %}&sample_condition={{ request.GET.sample_condition }}{% endif %}{% if request.GET.user_created %}&user_created={{ request.GET.user_created }}{% endif %}{% if request.GET.visit_code %}&visit_code={{ request.GET.visit_code }}{% endif %}{% if request.GET.requisition_id %}&requisition_id={{ request.GET.requisition_id }}{% endif %}{% if request.GET.sample_type__id %}&sample_type__id={{ request.GET.sample_type__id }}{% endif %}{% if request.GET.source_file__id %}&source_file__id={{ request.GET.source_file__id }}{% endif %}{% if request.GET.sample_status__id %}&sample_status__id={{ request.GET.sample_status__id }}{% endif %}{% if request.GET.box_position__box__id %}&box_position__box__id={{ request.GET.box_position__box__id }}{% endif %}{% if request.GET.box_position__box__freezer__id %}&box_position__box__freezer__id={{ request.GET.box_position__box__freezer__id }}{% endif %}{% if request.GET.box_position__box__freezer__facility__id %}&box_position__box__freezer__facility__id={{ request.GET.box_position__box__freezer__facility__id }}{% endif %}">
                                     <span aria-hidden="true">&raquo; Last</span>
                                 </a>
                             </li>

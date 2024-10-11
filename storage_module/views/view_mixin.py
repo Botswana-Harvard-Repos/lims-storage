@@ -18,7 +18,7 @@ class ViewMixin:
         headers = ['Sample ID', 'Sample Type', 'Source File Name', 'Condition',
                    'Created By', 'Participant ID', 'Gender', 'Date of Birth',
                    'Date Sampled', 'Time Sampled', 'Requisition ID', 'Protocol Number',
-                   'Facility Name', 'Box Name', 'Sample Status']
+                   'Facility Name', 'Freezer Name','Box Name', 'Sample Status']
         writer.writerow(headers)
 
         samples = DimSample.objects.filter(sample_id__in=sample_ids)
@@ -37,6 +37,7 @@ class ViewMixin:
                 sample.requisition_id if sample.requisition_id else "",
                 sample.protocol_number if sample.protocol_number else "",
                 sample.facility.facility_name if sample.facility else "",
+                sample.freezer.freezer_name if sample.freezer else "",
                 sample.box.box_name if sample.box else "",
                 sample.sample_status.name if sample.sample_status else ""
             ])

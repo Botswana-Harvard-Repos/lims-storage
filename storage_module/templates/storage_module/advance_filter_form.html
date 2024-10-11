@@ -35,12 +35,20 @@
                             {% render_field advanced_filter_form.gender class="form-control" %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="date_of_birth">Date of Birth</label>
-                            {% render_field advanced_filter_form.date_of_birth class="form-control" %}
+                            <label for="date_of_birth_start">Date of Birth Start</label>
+                            {% render_field advanced_filter_form.date_of_birth_start class="form-control" %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="date_sampled">Date Sampled</label>
-                            {% render_field advanced_filter_form.date_sampled class="form-control" %}
+                            <label for="date_of_birth_end">Date of Birth End</label>
+                            {% render_field advanced_filter_form.date_of_birth_end class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date_sampled_start">Date Sampled Start</label>
+                            {% render_field advanced_filter_form.date_sampled_start class="form-control" %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date_sampled_end">Date Sampled End</label>
+                            {% render_field advanced_filter_form.date_sampled_end class="form-control" %}
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="sample_condition">Sample Condition</label>
