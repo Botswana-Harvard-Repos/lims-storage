@@ -105,6 +105,7 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
             'box_position__box__box_name',
             'box_position__box__id',
             'date_sampled',
+            'protocol_number',
             'sample_status__name'
         ).order_by('-sample_type')
 

@@ -167,6 +167,7 @@
                         </th>
                         <th>Sample ID</th>
                         <th>Sample Type</th>
+                        <th>Study ID</th>
                         <th>Facility Name</th>
                         <th>Freeze Name</th>
                         <th>Source File Name</th>
@@ -184,6 +185,7 @@
                                        value="{{ sample.sample_id }}"></td>
                             <td>{{ sample.sample_id }}</td>
                             <td>{{ sample.sample_type__sample_type }}</td>
+                            <td>{{ sample.protocol_number }}</td>
                             <td>
                                 <a href="{% if sample.box_position__box__id %} {% url 'facility_detail' sample.box_position__box__freezer__facility__id %} {% endif %}">
                                     {{ sample.box_position__box__freezer__facility__facility_name }}
